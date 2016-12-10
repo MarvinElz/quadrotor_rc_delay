@@ -1,9 +1,14 @@
 #include "ros/ros.h"
 #include "sensor_msgs/Joy.h"
+#include "std_srvs/Empty.h" // nur Testzweck
 #include <vector>
 
 std::vector<sensor_msgs::Joy::Ptr> queue;
-ros::Duration delay_time(5.0); 
+ros::Duration delay_time(3.0); 
+
+bool set_delay_time(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp){
+  //delay_time
+}
 
 void callback_rc_signal( const sensor_msgs::Joy::Ptr& msg )
 {  
@@ -16,12 +21,11 @@ int main( int argc, char **argv )
 {
   ros::init(argc, argv, "rc_delay");
 
-  //ros::Duration delay_time(5.0); // 5 Sekunden (fuer Test)
+  ros::NodeHandle nh;
 
-  ros::NodeHandle n;
-
-  ros::Subscriber sub = n.subscribe( "joy", 10, callback_rc_signal);
-  ros::Publisher pub = n.advertise<sensor_msgs::Joy>("rc_signal_delayed", 1000);
+  ros::Subscriber sub_Signal = nh.subscribe( "joy", 10, callback_rc_signal);
+  ros::ServiceServer service = nh.advertiseService("set_Delay_Time", set_delay_time);
+  ros::Publisher pub = nh.advertise<sensor_msgs::Joy>("rc_signal_delayed", 1000);
 
   ros::Rate loop_rate(100);
 
