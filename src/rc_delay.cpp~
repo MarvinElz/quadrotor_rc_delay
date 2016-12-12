@@ -4,7 +4,7 @@
 #include <vector>
 
 std::vector<sensor_msgs::Joy::Ptr> queue;
-ros::Duration delay_time(3.0); 
+ros::Duration delay_time(0.5); 
 
 bool set_delay_time(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp){
   //delay_time
