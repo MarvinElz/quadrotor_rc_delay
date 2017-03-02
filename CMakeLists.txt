@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+	roslaunch
   dynamic_reconfigure
 )
 
@@ -195,7 +196,7 @@ include_directories(
 
 #include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_executable( rc_delay src/rc_delay.cpp )
-target_link_libraries(rc_delay ${catkin_LIBRARIES} )
-add_dependencies( rc_delay sensor_msgs ${quadrotor_rc_delay}_gencfg)
+add_executable( RC_Delay src/rc_delay.cpp )
+target_link_libraries(RC_Delay ${catkin_LIBRARIES} )
+add_dependencies( RC_Delay sensor_msgs ${quadrotor_rc_delay}_gencfg)
 
