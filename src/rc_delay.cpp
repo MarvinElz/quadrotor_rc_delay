@@ -7,6 +7,16 @@
 #include "std_msgs/Float32.h" // nur Testzweck
 #include <vector>
 
+// #define LOGGING
+#ifdef LOGGING
+	#include <fstream>
+	using namespace std;
+	ofstream logFile;
+#endif
+ros::Time startTime;
+double aktuell = 0;
+double verzoegert = 0;
+
 std::vector<sensor_msgs::Joy::Ptr> queue;
 ros::Duration delay_time(0.01); 
 
@@ -25,6 +35,9 @@ void callbackSetDelayTime(quadrotor_rc_delay::DelayTimeConfig &config, uint32_t 
 void callbackRCSignal( const sensor_msgs::Joy::Ptr& msg )
 {  
 	msg->header.stamp += delay_time;
+	
+	aktuell = msg->axes[4] * 3.0;
+
 	queue.push_back(msg);
 	ROS_INFO("Queue Size: %lu\n", queue.size() );
 }
@@ -34,6 +47,17 @@ int main( int argc, char **argv )
 	ros::init(argc, argv, "rc_delay");
 
 	ros::NodeHandle nh;
+
+	startTime = ros::Time::now();
+	#ifdef LOGGING
+		char filePathName[] = "/home/robo/Desktop/logRC.txt";
+		logFile.open(filePathName); 
+		if(!logFile.is_open()){
+			ROS_ERROR("Logfile: '%s' konnte nicht geöffnet werden. Beende.", filePathName);
+			return 0;
+		}
+		logFile << " Time , 	aktuell  ,  verzoegert" << std::endl; 
+	#endif
 
 	ros::Subscriber sub_Signal = nh.subscribe( "joy", 10, callbackRCSignal);
 
@@ -52,10 +76,13 @@ int main( int argc, char **argv )
     		ros::Time now = ros::Time::now();
     		while( queue.size() > 0 && queue.front()->header.stamp < now )
     		{
+						verzoegert = queue.front()->axes[4] * 3.0;
        			pub.publish(queue.front());
        			queue.erase(queue.begin());
     		}
-
+				#ifdef LOGGING
+					logFile << (now - startTime).toSec() << " , " <<aktuell << " , " << verzoegert << std::endl; 
+				#endif
     		ros::spinOnce();
     		loop_rate.sleep();
   	}
